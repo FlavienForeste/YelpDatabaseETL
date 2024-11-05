@@ -1,0 +1,23 @@
+# YelpDatasetETL
+This project implements an ETL (Extract, Transform, Load) pipeline for processing and analyzing the Yelp dataset, with storage in an Azure SQL Database. The pipeline extracts raw Yelp data, transforms it into a structured format, and loads it into a cloud-hosted database, enabling easy querying and analysis for various applications.
+
+Data Extraction: Efficiently reads raw Yelp data (in JSON, CSV, or other formats) from a local source or cloud storage.
+Data Transformation: Cleans, filters, and structures the data for analytical processing. This includes:
+Handling missing or inconsistent data.
+Structuring data to match the Azure database schema.
+Data Loading: Inserts transformed data into an Azure SQL Database, providing secure, scalable, and queryable storage.
+Error Handling and Logging: Includes logging for tracking pipeline execution and error handling for resilience.
+Modular Codebase: Each ETL stage (Extract, Transform, Load) is encapsulated for easy maintenance and scalability.
+
+The Yelp dataset includes information such as business details, user reviews, and other attributes. This dataset is used under Yelp's Dataset Terms of Use.
+
+#Prerequisites
+Azure Account: Set up an Azure account and create an Azure SQL Database instance.
+Yelp Dataset: Download the Yelp dataset from Yelp's Dataset page.
+Python Libraries: Install dependencies listed in requirements.txt:
+bash
+Copy code
+pip install -r requirements.txt
+Azure Configuration: Update your Azure credentials in the environment file .env (details below).
+
+
