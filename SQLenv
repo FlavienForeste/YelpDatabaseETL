@@ -1,0 +1,8 @@
+!pip install mysqlclient
+
+%load_ext sql
+username = "enter-your-username"
+password = "enter-your-password"
+server = "enter-your-server-name"
+database = "enter-your-database-name"
+%sql mssql+pyodbc://sqladmin:password@server/database?driver=ODBC+Driver+17+for+SQL+Server
