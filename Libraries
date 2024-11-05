@@ -1,0 +1,21 @@
+!pip install sqlalchemy
+!pip install pyodbc
+
+import numpy as np # linear algebra
+import pandas as pd # data processing, CSV file I/O (e.g. pd.read_csv)
+import os
+import json
+import pandas as pd
+import pyodbc
+from sqlalchemy import create_engine
+import sqlalchemy
+
+
+
+!apt-get update
+!apt-get install -y unixodbc unixodbc-dev
+# download Microsoft SQL Server ODBC driver 17
+!curl https://packages.microsoft.com/keys/microsoft.asc | apt-key add -
+!curl https://packages.microsoft.com/config/ubuntu/$(lsb_release -rs)/prod.list | tee /etc/apt/sources.list.d/mssql-release.list
+!apt-get update
+!ACCEPT_EULA=Y apt-get install -y msodbcsql17
