@@ -1,0 +1,93 @@
+# This Python 3 environment comes with many helpful analytics libraries installed
+# It is defined by the kaggle/python Docker image: https://github.com/kaggle/docker-python
+# For example, here's several helpful packages to load
+
+import numpy as np # linear algebra
+import pandas as pd # data processing, CSV file I/O (e.g. pd.read_csv)
+import json
+import pandas as pd
+import os 
+import sqlalchemy
+from sqlalchemy import create_engine
+from pandas import json_normalize
+
+
+# Input data files are available in the read-only "../input/" directory
+# For example, running this (by clicking run or pressing Shift+Enter) will list all files under the input directory
+
+import os
+for dirname, _, filenames in os.walk('/kaggle/input'):
+    for filename in filenames:
+        print(os.path.join(dirname, filename))
+
+#Converting JSON data to a Pandas DataFrame and further exploration
+data_file = open("/kaggle/input/yelp-dataset/yelp_academic_dataset_review.json")
+data = []
+for line in data_file:
+    data.append(json.loads(line))
+review_df = pd.DataFrame(data)
+data_file.close()
+data_file = open("/kaggle/input/yelp-dataset/yelp_academic_dataset_checkin.json")
+data = []
+for line in data_file:
+    data.append(json.loads(line))
+checkin_df = pd.DataFrame(data)
+data_file.close()
+data_file = open("/kaggle/input/yelp-dataset/yelp_academic_dataset_business.json")
+data = []
+for line in data_file:
+    data.append(json.loads(line))
+business_df = pd.DataFrame(data)
+data_file.close()
+data_file = open("/kaggle/input/yelp-dataset/yelp_academic_dataset_tip.json")
+data = []
+for line in data_file:
+    data.append(json.loads(line))
+tip_df = pd.DataFrame(data)
+data_file.close()
+data_file = open("/kaggle/input/yelp-dataset/yelp_academic_dataset_user.json")
+data = []
+for line in data_file:
+    data.append(json.loads(line))
+user_df = pd.DataFrame(data)
+data_file.close()
+
+#connecting to azure database
+# Define connection details
+username = 'enter-your-username'      # Replace with your Azure SQL admin username
+password = 'enter-your-password'      # Replace with your Azure SQL password
+server = 'enter-your-server-name'.    # Replace with your Azure SQL server name
+database = 'enter-your-database-name' # Replace with your Azure SQL database name
+
+
+# Connection string for Azure SQL Server
+connection_string = f"mssql+pyodbc://{username}:{password}@{server}:1433/{database}?driver=ODBC+Driver+17+for+SQL+Server"
+engine = create_engine(connection_string)
+
+
+#upload your converted datasets to Azure SQL database
+business_df.to_sql(name = "business_df", con = engine, if_exists='replace', index=True, dtype={'attributes': sqlalchemy.types.JSON, 'hours': sqlalchemy.types.JSON}, chunksize=50000)
+checkin_df.to_sql(name="checkin_df", con=engine, if_exists='replace', index=True,dtype={'attributes': sqlalchemy.types.NVARCHAR, 'hours': sqlalchemy.types.NVARCHAR},chunksize=5000)
+user_df.to_sql(name="user_df", con=engine, if_exists='replace', index=True,dtype={'attributes': sqlalchemy.types.NVARCHAR, 'hours': sqlalchemy.types.NVARCHAR},chunksize=5000)
+review_df.to_sql(name="review_df", con=engine, if_exists='replace', index=True,dtype={'attributes': sqlalchemy.types.NVARCHAR, 'hours': sqlalchemy.types.NVARCHAR},chunksize=5000)
+tip_df.to_sql(name="tip_df", con=engine, if_exists='replace', index=True,dtype={'attributes': sqlalchemy.types.NVARCHAR, 'hours': sqlalchemy.types.NVARCHAR},chunksize=5000)
+
+
+
+#Flattening two nested columns (attributes and hours) within a DataFrame
+df_flat = json_normalize(business_df['attributes'])
+df_flat2 = json_normalize(business_df['hours'])
+business_df = pd.concat([business_df, df_flat], axis=1).drop(columns=['attributes','hours'])
+
+#Setting up the environment for SQL on Azure Notebook
+username = "enter-your-username"
+password = "enter-your-password"
+server = "enter-your-server-name"
+database = "enter-your-database-name"
+
+# Set up the connection string
+connection_string = f'DRIVER={{ODBC Driver 17 for SQL Server}};SERVER={server};DATABASE={database};UID={username};PWD={password}'
+
+# Connect to the database
+connection = pyodbc.connect(connection_string)
+print("Successful!")
